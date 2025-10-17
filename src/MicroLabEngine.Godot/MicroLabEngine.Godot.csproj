@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  <!-- Default Godot install directory on Windows. Override by setting the GODOT_INSTALL_DIR MSBuild property. -->
+  <GODOT_INSTALL_DIR Condition="'$(GODOT_INSTALL_DIR)'==''">C:\\Users\\USER\\OneDrive\\Documentos\\MicroLab Studios\\Software\\Godot_v4.3-stable_mono_win64</GODOT_INSTALL_DIR>
+    <!-- If Godot C# assemblies are packaged in a specific subfolder (Api\Release), prefer that for direct assembly references. -->
+    <GODOT_ASSEMBLY_DIR Condition="'$(GODOT_ASSEMBLY_DIR)'==''">$(GODOT_INSTALL_DIR)\\GodotSharp\\Api\\Release</GODOT_ASSEMBLY_DIR>
+    <!-- Help MSBuild resolve Godot assemblies by adding the assembly directory to ReferencePath -->
+    <ReferencePath>$(GODOT_ASSEMBLY_DIR);$(ReferencePath)</ReferencePath>
+    <!-- Suppress MSB3245 when Godot assemblies are located by HintPath but MSBuild still warns about identity resolution -->
+    <NoWarn>$(NoWarn);MSB3245</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference the core project in the solution -->
+    <ProjectReference Include="..\MicroLabEngine.Core\MicroLabEngine.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Typical Godot C# assemblies. These paths assume the default Windows install layout under GODOT_INSTALL_DIR. -->
+    <!-- Users can override GODOT_INSTALL_DIR or remove these references if using a different Godot layout. -->
+    <!-- Try to locate GodotSharp.dll anywhere under the GODOT_INSTALL_DIR. This is a flexible fallback for different Godot layouts. -->
+    <!-- Prefer explicit assembly dir when present -->
+      <GodotSharpFiles Include="$(GODOT_ASSEMBLY_DIR)\\GodotSharp.dll" Condition="Exists('$(GODOT_ASSEMBLY_DIR)\\GodotSharp.dll')" />
+  
+    
+
+    <GodotSharpEditorFiles Include="$(GODOT_ASSEMBLY_DIR)\\GodotSharpEditorPlugin.dll" Condition="Exists('$(GODOT_ASSEMBLY_DIR)\\GodotSharpEditorPlugin.dll')" />
+
+    <!-- Fallback to searching the entire install dir if not found in the explicit assembly dir -->
+    <GodotSharpFiles Include="$(GODOT_INSTALL_DIR)\\**\\GodotSharp.dll" Condition="'@(GodotSharpFiles)'==''" />
+    <GodotSharpEditorFiles Include="$(GODOT_INSTALL_DIR)\\**\\GodotSharpEditorPlugin.dll" Condition="'@(GodotSharpEditorFiles)'==''" />
+
+    <Reference Include="GodotSharp" Condition="'@(GodotSharpFiles)' != ''">
+      <HintPath>%(GodotSharpFiles.Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <Reference Include="GodotSharpEditorPlugin" Condition="'@(GodotSharpEditorFiles)' != ''">
+      <HintPath>%(GodotSharpEditorFiles.Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

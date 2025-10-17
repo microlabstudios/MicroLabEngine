@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <!-- Redirect all project outputs to a shared folder on C: so Godot projects can reference them directly -->
+    <SharedOutputRoot>C:\\MicroLabEngine</SharedOutputRoot>
+    <!-- Use per-project folders (including project name) to avoid collisions between projects -->
+    <OutputPath>$(SharedOutputRoot)\\$(MSBuildProjectName)\\$(Configuration)\\$(TargetFramework)\\</OutputPath>
+    <!-- Leave intermediate (obj) paths untouched so SDK-generated assembly attributes remain correct -->
+  </PropertyGroup>
+</Project>

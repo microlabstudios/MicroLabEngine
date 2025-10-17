@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <!-- Central folder for Godot runtime assemblies copied from the user's Godot installation -->
+    <GodotSharedOutputDir>C:\\MicroLabEngine\\Common</GodotSharedOutputDir>
+  </PropertyGroup>
+
+  <Target Name="CopyGodotAssembliesToCommon" AfterTargets="Build">
+    <!-- Determine assembly files: prefer GODOT_ASSEMBLY_DIR, fallback to searching GODOT_INSTALL_DIR -->
+    <ItemGroup>
+      <_GodotAssemblyCandidates Include="$(GODOT_ASSEMBLY_DIR)\GodotSharp.dll" Condition="'$(GODOT_ASSEMBLY_DIR)' != '' And Exists('$(GODOT_ASSEMBLY_DIR)\GodotSharp.dll')" />
+      <_GodotAssemblyCandidates Include="$(GODOT_INSTALL_DIR)\**\GodotSharp.dll" Condition="'$(GODOT_INSTALL_DIR)' != '' And '@(_GodotAssemblyCandidates)'==''" />
+      <_GodotEditorCandidates Include="$(GODOT_ASSEMBLY_DIR)\GodotSharpEditorPlugin.dll" Condition="'$(GODOT_ASSEMBLY_DIR)' != '' And Exists('$(GODOT_ASSEMBLY_DIR)\GodotSharpEditorPlugin.dll')" />
+      <_GodotEditorCandidates Include="$(GODOT_INSTALL_DIR)\**\GodotSharpEditorPlugin.dll" Condition="'$(GODOT_INSTALL_DIR)' != '' And '@(_GodotEditorCandidates)'==''" />
+    </ItemGroup>
+
+    <!-- Create the shared output directory if it doesn't exist and copy found files there -->
+    <MakeDir Directories="$(GodotSharedOutputDir)" Condition="'$(GodotSharedOutputDir)' != '' And !Exists('$(GodotSharedOutputDir)')" />
+    <Copy SourceFiles="@(_GodotAssemblyCandidates)" DestinationFolder="$(GodotSharedOutputDir)" SkipUnchangedFiles="true" Condition="'@(_GodotAssemblyCandidates)' != ''" />
+    <Copy SourceFiles="@(_GodotEditorCandidates)" DestinationFolder="$(GodotSharedOutputDir)" SkipUnchangedFiles="true" Condition="'@(_GodotEditorCandidates)' != ''" />
+  </Target>
+</Project>
