@@ -5,6 +5,5 @@ namespace MicroLabEngine.Core
     /// </summary>
     public static class CoreService
     {
-        public static string GetLibraryName() => "MicroLabEngine.Core";
     }
 }

@@ -1,7 +1,8 @@
 <Project>
   <PropertyGroup>
     <!-- Central folder for Godot runtime assemblies copied from the user's Godot installation -->
-    <GodotSharedOutputDir>C:\\MicroLabEngine\\Common</GodotSharedOutputDir>
+    <!-- Change this to C:\MicroLabEngine to place Godot DLLs directly in the root (no subfolders) -->
+    <GodotSharedOutputDir>C:\\MicroLabEngine</GodotSharedOutputDir>
   </PropertyGroup>
 
   <Target Name="CopyGodotAssembliesToCommon" AfterTargets="Build">
@@ -17,5 +18,22 @@
     <MakeDir Directories="$(GodotSharedOutputDir)" Condition="'$(GodotSharedOutputDir)' != '' And !Exists('$(GodotSharedOutputDir)')" />
     <Copy SourceFiles="@(_GodotAssemblyCandidates)" DestinationFolder="$(GodotSharedOutputDir)" SkipUnchangedFiles="true" Condition="'@(_GodotAssemblyCandidates)' != ''" />
     <Copy SourceFiles="@(_GodotEditorCandidates)" DestinationFolder="$(GodotSharedOutputDir)" SkipUnchangedFiles="true" Condition="'@(_GodotEditorCandidates)' != ''" />
+  </Target>
+
+  <!-- Copy each project's primary output assembly (TargetPath) into the shared flat directory for this solution -->
+  <Target Name="CopyProjectPrimaryOutputToMicroLabRoot" AfterTargets="Build" Condition="'$(MicroLabSharedDir)' != ''">
+    <!-- Ensure the shared folder exists -->
+    <MakeDir Directories="$(MicroLabSharedDir)" Condition="!Exists('$(MicroLabSharedDir)')" />
+
+    <ItemGroup>
+      <!-- Add this project's primary compiled assembly if present -->
+      <_PrimaryAssembly Include="$(TargetPath)" Condition="'$(TargetPath)' != '' And Exists('$(TargetPath)')" />
+    </ItemGroup>
+
+    <!-- Copy to shared dir using the assembly filename (flat) -->
+    <Copy SourceFiles="@(_PrimaryAssembly)"
+          DestinationFiles="@(_PrimaryAssembly->'$(MicroLabSharedDir)\\%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"
+          Condition="'@(_PrimaryAssembly)' != ''" />
   </Target>
 </Project>

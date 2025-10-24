@@ -8,9 +8,6 @@ namespace MicroLabEngine.Godot
     /// </summary>
     public static class GodotHelpers
     {
-        public static string GetCombinedName()
-        {
-            return $"{CoreService.GetLibraryName()} + MicroLabEngine.Godot";
-        }
+        
     }
 }
