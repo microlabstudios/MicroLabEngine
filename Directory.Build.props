@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Shared flat folder to collect project output DLLs -->
+    <MicroLabSharedDir Condition="'$(MicroLabSharedDir)'==''">C:\MicroLabEngine</MicroLabSharedDir>
+  </PropertyGroup>
+</Project>

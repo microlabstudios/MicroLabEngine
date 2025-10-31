@@ -1,0 +1,34 @@
+<Project>
+  <Target Name="CopyProjectOutput" AfterTargets="Build">
+    <ItemGroup>
+      <OutputFiles Include="$(TargetDir)\*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(MicroLabSharedDir)" SkipUnchangedFiles="false" />
+    <Message Text="Copied $(TargetFileName) to $(MicroLabSharedDir)" Importance="high" />
+  </Target>
+
+  <Target Name="CleanSharedDir" BeforeTargets="Clean">
+    <ItemGroup>
+      <FilesToDelete Include="$(MicroLabSharedDir)\$(TargetFileName)" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+    <Message Text="Cleaned $(TargetFileName) from $(MicroLabSharedDir)" Importance="high" />
+  </Target>
+
+  <!-- Copy each project's primary output assembly (TargetPath) into the shared flat directory for this solution -->
+  <Target Name="CopyProjectPrimaryOutputToMicroLabRoot" AfterTargets="Build" Condition="'$(MicroLabSharedDir)' != ''">
+    <!-- Ensure the shared folder exists -->
+    <MakeDir Directories="$(MicroLabSharedDir)" Condition="!Exists('$(MicroLabSharedDir)')" />
+
+    <ItemGroup>
+      <!-- Add this project's primary compiled assembly if present -->
+      <_PrimaryAssembly Include="$(TargetPath)" Condition="'$(TargetPath)' != '' And Exists('$(TargetPath)')" />
+    </ItemGroup>
+
+    <!-- Copy to shared dir using the assembly filename (flat) -->
+    <Copy SourceFiles="@(_PrimaryAssembly)"
+          DestinationFiles="@(_PrimaryAssembly->'$(MicroLabSharedDir)\\%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"
+          Condition="'@(_PrimaryAssembly)' != ''" />
+  </Target>
+</Project>
