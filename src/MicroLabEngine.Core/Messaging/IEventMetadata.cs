@@ -1,3 +1,5 @@
+namespace MicroLabEngine.Core.Messaging;
+
 public interface IEventMetadata
 {
     Dictionary<string, Tuple<object, Type>> Values { get; }

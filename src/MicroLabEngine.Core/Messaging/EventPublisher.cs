@@ -1,13 +1,25 @@
+namespace MicroLabEngine.Core.Messaging;
+
 public static class EventPublisher<TEventType>
 {
-    private delegate void EventHandler();
-    private static event EventHandler OnEventPublished;
+    public delegate void Message(TEventType eventData);
+    private static event Message? OnEventPublished;
 
-    public static void PublishEvent()
+    public static void PublishEvent(TEventType eventData)
     {
         if (OnEventPublished != null)
         {
-            OnEventPublished.Invoke();
+            OnEventPublished.Invoke(eventData);
         }
+    }
+
+    public static void Subscribe(Message handler)
+    {
+        OnEventPublished += handler;
+    }
+
+    public static void Unsubscribe(Message handler)
+    {
+        OnEventPublished -= handler;
     }
 }

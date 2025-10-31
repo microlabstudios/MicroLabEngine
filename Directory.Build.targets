@@ -1,23 +1,18 @@
 <Project>
-  <PropertyGroup>
-    <!-- Central folder for Godot runtime assemblies copied from the user's Godot installation -->
-    <!-- Change this to C:\MicroLabEngine to place Godot DLLs directly in the root (no subfolders) -->
-    <GodotSharedOutputDir>C:\\MicroLabEngine</GodotSharedOutputDir>
-  </PropertyGroup>
-
-  <Target Name="CopyGodotAssembliesToCommon" AfterTargets="Build">
-    <!-- Determine assembly files: prefer GODOT_ASSEMBLY_DIR, fallback to searching GODOT_INSTALL_DIR -->
+  <Target Name="CopyProjectOutput" AfterTargets="Build">
     <ItemGroup>
-      <_GodotAssemblyCandidates Include="$(GODOT_ASSEMBLY_DIR)\GodotSharp.dll" Condition="'$(GODOT_ASSEMBLY_DIR)' != '' And Exists('$(GODOT_ASSEMBLY_DIR)\GodotSharp.dll')" />
-      <_GodotAssemblyCandidates Include="$(GODOT_INSTALL_DIR)\**\GodotSharp.dll" Condition="'$(GODOT_INSTALL_DIR)' != '' And '@(_GodotAssemblyCandidates)'==''" />
-      <_GodotEditorCandidates Include="$(GODOT_ASSEMBLY_DIR)\GodotSharpEditorPlugin.dll" Condition="'$(GODOT_ASSEMBLY_DIR)' != '' And Exists('$(GODOT_ASSEMBLY_DIR)\GodotSharpEditorPlugin.dll')" />
-      <_GodotEditorCandidates Include="$(GODOT_INSTALL_DIR)\**\GodotSharpEditorPlugin.dll" Condition="'$(GODOT_INSTALL_DIR)' != '' And '@(_GodotEditorCandidates)'==''" />
+      <OutputFiles Include="$(TargetDir)\*.dll" />
     </ItemGroup>
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(MicroLabSharedDir)" SkipUnchangedFiles="false" />
+    <Message Text="Copied $(TargetFileName) to $(MicroLabSharedDir)" Importance="high" />
+  </Target>
 
-    <!-- Create the shared output directory if it doesn't exist and copy found files there -->
-    <MakeDir Directories="$(GodotSharedOutputDir)" Condition="'$(GodotSharedOutputDir)' != '' And !Exists('$(GodotSharedOutputDir)')" />
-    <Copy SourceFiles="@(_GodotAssemblyCandidates)" DestinationFolder="$(GodotSharedOutputDir)" SkipUnchangedFiles="true" Condition="'@(_GodotAssemblyCandidates)' != ''" />
-    <Copy SourceFiles="@(_GodotEditorCandidates)" DestinationFolder="$(GodotSharedOutputDir)" SkipUnchangedFiles="true" Condition="'@(_GodotEditorCandidates)' != ''" />
+  <Target Name="CleanSharedDir" BeforeTargets="Clean">
+    <ItemGroup>
+      <FilesToDelete Include="$(MicroLabSharedDir)\$(TargetFileName)" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+    <Message Text="Cleaned $(TargetFileName) from $(MicroLabSharedDir)" Importance="high" />
   </Target>
 
   <!-- Copy each project's primary output assembly (TargetPath) into the shared flat directory for this solution -->
